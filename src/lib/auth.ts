@@ -1,7 +1,6 @@
 import { createAuthClient } from "better-auth/react";
 
-const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000/trpc";
-const baseURL = apiUrl.replace('/trpc', '');
+const baseURL = "https://backend-link-app-production.up.railway.app";
 
 export const authClient = createAuthClient({
   baseURL: baseURL,
