@@ -5,6 +5,10 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 5173,
+    cors: {
+      origin: true,
+      credentials: true,
+    },
     proxy: {
       '/trpc': {
         target: process.env.VITE_API_URL?.replace('/trpc', '') || 'http://localhost:3000',
