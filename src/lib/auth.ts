@@ -5,6 +5,7 @@ const baseURL = apiUrl.replace('/trpc', '');
 
 export const authClient = createAuthClient({
   baseURL: baseURL,
+  fetch: (url, options) => fetch(url, { ...options, credentials: "include" }),
 });
 
 export const { signIn, signUp, signOut, useSession } = authClient;
