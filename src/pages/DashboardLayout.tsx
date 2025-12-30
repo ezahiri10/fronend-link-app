@@ -9,12 +9,7 @@ export default function DashboardLayout() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    console.log('DashboardLayout - Session:', session, 'isPending:', isPending)
-  }, [session, isPending])
-
-  useEffect(() => {
     if (!isPending && !session?.user) {
-      console.log('No session found, redirecting to login')
       navigate({ to: '/login' })
     }
   }, [session, isPending, navigate])

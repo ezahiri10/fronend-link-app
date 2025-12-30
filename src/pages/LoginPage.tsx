@@ -21,7 +21,6 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Login form submitted"); // <-- Debug log
     setEmailError("");
     setPasswordError("");
 
@@ -52,24 +51,17 @@ export default function LoginPage() {
         password,
       });
       
-      console.log("Login result:", result);
-      console.log("Cookies after login:", document.cookie);
-      
       if (result.error) {
-        console.error("Login error:", result.error);
         setEmailError("Invalid credentials");
         setPasswordError("Invalid credentials");
         return;
       }
       
-      // Wait 2 seconds for cookies to be set and session to sync
-      console.log("Login successful, waiting for session sync...");
+      // Wait briefly for session to sync, then redirect
       setTimeout(() => {
-        console.log("Redirecting to dashboard...");
         window.location.href = "/dashboard/links";
-      }, 2000);
+      }, 500);
     } catch (error: any) {
-      console.error("Login exception:", error);
       setEmailError("Invalid credentials");
       setPasswordError("Invalid credentials");
       setIsLoading(false);
