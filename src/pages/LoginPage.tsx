@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { signIn } from "../lib/auth";
+import { signIn, useSession } from "../lib/auth";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { Input } from "../components/ui/Input";
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const { refetch } = useSession();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState("");
@@ -34,6 +35,8 @@ export default function LoginPage() {
       setPasswordError("Can't be empty");
       hasError = true;
     }
+      // Force session refetch after login
+      await refetch();
 
     if (hasError) return;
 
