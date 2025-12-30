@@ -35,8 +35,6 @@ export default function LoginPage() {
       setPasswordError("Can't be empty");
       hasError = true;
     }
-      // Force session refetch after login
-      await refetch();
 
     if (hasError) return;
 
@@ -52,8 +50,8 @@ export default function LoginPage() {
         setPasswordError("Invalid credentials");
         return;
       }
-      
-      await navigate({ to: "/dashboard/links" });
+      // Force full page reload to ensure session is fetched fresh
+      window.location.href = "/dashboard/links";
     } catch (error: any) {
       setEmailError("Invalid credentials");
       setPasswordError("Invalid credentials");
