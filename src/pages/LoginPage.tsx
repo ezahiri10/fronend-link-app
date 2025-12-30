@@ -1,10 +1,9 @@
 import { useState } from "react";
-import { signIn, useSession } from "../lib/auth";
+import { signIn } from "../lib/auth";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { Input } from "../components/ui/Input";
 
-// Force session refetch after login
-  const { refetch } = useSession();
+export default function LoginPage() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -44,13 +43,13 @@ import { Input } from "../components/ui/Input";
         email,
         password,
       });
+      
       if (result.error) {
         setEmailError("Invalid credentials");
         setPasswordError("Invalid credentials");
         return;
       }
-      // Refetch session after login to update UI
-      await refetch();
+      
       await navigate({ to: "/dashboard/links" });
     } catch (error: any) {
       setEmailError("Invalid credentials");
