@@ -6,7 +6,7 @@ import { trpc } from '../lib/trpc';
 export function useAuth() {
   const navigate = useNavigate();
   const { data: session, isPending } = useSession();
-  const [hasChecked, setHasChecked] = useState(false);
+  const [redirectTimeout, setRedirectTimeout] = useState<NodeJS.Timeout | null>(null);
   
   const { data: user, isLoading } = trpc.user.me.useQuery(undefined, {
     retry: false,
@@ -15,16 +15,26 @@ export function useAuth() {
   });
 
   useEffect(() => {
-    // Wait for initial session check to complete
-    if (!isPending && !hasChecked) {
-      setHasChecked(true);
+    // Clear any existing timeout
+    if (redirectTimeout) {
+      clearTimeout(redirectTimeout);
     }
     
-    // Only redirect after we've confirmed no session exists
-    if (hasChecked && !isPending && !session?.user) {
-      navigate({ to: '/login' });
+    // If session check is complete and there's no session, wait a bit before redirecting
+    // This gives time for cookies to be read after page reload
+    if (!isPending && !session?.user) {
+      const timeout = setTimeout(() => {
+        navigate({ to: '/login' });
+      }, 500);
+      setRedirectTimeout(timeout);
     }
-  }, [session, isPending, hasChecked, navigate]);
+    
+    return () => {
+      if (redirectTimeout) {
+        clearTimeout(redirectTimeout);
+      }
+    };
+  }, [session, isPending]);
 
-  return { user: user || session?.user, isLoading: isLoading || isPending || !hasChecked };
+  return { user: user || session?.user, isLoading: isLoading || isPending };
 }
