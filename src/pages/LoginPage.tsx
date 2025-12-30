@@ -1,16 +1,23 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { signIn, useSession } from "../lib/auth";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { Input } from "../components/ui/Input";
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const { refetch } = useSession();
+  const { data: session, isPending } = useSession();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (!isPending && session?.user) {
+      navigate({ to: "/dashboard/links" });
+    }
+  }, [session, isPending, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,7 +50,6 @@ export default function LoginPage() {
       const result = await signIn.email({
         email,
         password,
-        callbackURL: "/dashboard/links",
       });
       
       if (result.error) {
@@ -51,11 +57,14 @@ export default function LoginPage() {
         setPasswordError("Invalid credentials");
         return;
       }
-      // better-auth will handle the redirect automatically with callbackURL
+      
+      // Wait briefly for cookies to be set, then redirect
+      setTimeout(() => {
+        window.location.href = "/dashboard/links";
+      }, 500);
     } catch (error: any) {
       setEmailError("Invalid credentials");
       setPasswordError("Invalid credentials");
-    } finally {
       setIsLoading(false);
     }
   };

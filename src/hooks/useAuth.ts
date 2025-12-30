@@ -14,14 +14,11 @@ export function useAuth() {
   });
 
   useEffect(() => {
-    // Only redirect if definitely not authenticated after loading completes
-    if (!isPending && !isLoading && !session?.user && !user) {
-      const timer = setTimeout(() => {
-        navigate({ to: '/login' });
-      }, 1000);
-      return () => clearTimeout(timer);
+    // Only redirect if session check is complete and user is definitely not authenticated
+    if (!isPending && !isLoading && !session?.user) {
+      navigate({ to: '/login' });
     }
-  }, [session, isPending, isLoading, user, navigate]);
+  }, [session, isPending, isLoading, navigate]);
 
   return { user: user || session?.user, isLoading: isLoading || isPending };
 }
