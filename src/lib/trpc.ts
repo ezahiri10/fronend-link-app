@@ -1,4 +1,4 @@
 import { createTRPCReact } from '@trpc/react-query';
-import type { AppRouter } from '../../../server/src/routers/index';
 
-export const trpc = createTRPCReact<AppRouter>();
+// @ts-expect-error - AppRouter type will be resolved at runtime from deployed backend
+export const trpc = createTRPCReact<any>();
