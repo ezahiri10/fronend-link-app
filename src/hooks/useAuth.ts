@@ -1,11 +1,12 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { useSession } from '../lib/auth';
 import { trpc } from '../lib/trpc';
 
 export function useAuth() {
   const navigate = useNavigate();
-  const { data: session, isPending, error } = useSession();
+  const { data: session, isPending } = useSession();
+  const [hasChecked, setHasChecked] = useState(false);
   
   const { data: user, isLoading } = trpc.user.me.useQuery(undefined, {
     retry: false,
@@ -14,12 +15,16 @@ export function useAuth() {
   });
 
   useEffect(() => {
-    // Only redirect if session check is complete AND there's no session
-    // Don't redirect while still loading
-    if (!isPending && !session?.user && error) {
+    // Wait for initial session check to complete
+    if (!isPending && !hasChecked) {
+      setHasChecked(true);
+    }
+    
+    // Only redirect after we've confirmed no session exists
+    if (hasChecked && !isPending && !session?.user) {
       navigate({ to: '/login' });
     }
-  }, [session, isPending, error, navigate]);
+  }, [session, isPending, hasChecked, navigate]);
 
-  return { user: user || session?.user, isLoading: isLoading || isPending };
+  return { user: user || session?.user, isLoading: isLoading || isPending || !hasChecked };
 }
