@@ -43,6 +43,7 @@ export default function LoginPage() {
       const result = await signIn.email({
         email,
         password,
+        callbackURL: "/dashboard/links",
       });
       
       if (result.error) {
@@ -50,8 +51,7 @@ export default function LoginPage() {
         setPasswordError("Invalid credentials");
         return;
       }
-      // Force full page reload to ensure session is fetched fresh
-      window.location.href = "/dashboard/links";
+      // better-auth will handle the redirect automatically with callbackURL
     } catch (error: any) {
       setEmailError("Invalid credentials");
       setPasswordError("Invalid credentials");
