@@ -52,17 +52,24 @@ export default function LoginPage() {
         password,
       });
       
+      console.log("Login result:", result);
+      console.log("Cookies after login:", document.cookie);
+      
       if (result.error) {
+        console.error("Login error:", result.error);
         setEmailError("Invalid credentials");
         setPasswordError("Invalid credentials");
         return;
       }
       
-      // Wait briefly for cookies to be set, then redirect
+      // Wait 2 seconds for cookies to be set and session to sync
+      console.log("Login successful, waiting for session sync...");
       setTimeout(() => {
+        console.log("Redirecting to dashboard...");
         window.location.href = "/dashboard/links";
-      }, 500);
+      }, 2000);
     } catch (error: any) {
+      console.error("Login exception:", error);
       setEmailError("Invalid credentials");
       setPasswordError("Invalid credentials");
       setIsLoading(false);
