@@ -26,10 +26,23 @@ export default function ForgotPasswordPage() {
 
     try {
       setIsLoading(true);
-      await authClient.forgetPassword({
-        email,
-        redirectTo: '/reset-password',
+      
+      // Call Better Auth forget password endpoint directly
+      const response = await fetch(`${import.meta.env.VITE_API_URL?.replace('/trpc', '') || 'http://localhost:3000'}/api/auth/forget-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          email,
+          redirectTo: `${window.location.origin}/reset-password`,
+        }),
       });
+      
+      if (!response.ok) {
+        console.error('Forgot password response:', response.status, response.statusText);
+      }
       
       setIsSuccess(true);
     } catch (error: any) {

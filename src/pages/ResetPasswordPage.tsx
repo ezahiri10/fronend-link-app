@@ -50,10 +50,32 @@ export default function ResetPasswordPage() {
 
     try {
       setIsLoading(true);
-      await authClient.resetPassword({
-        newPassword: password,
-        token: token,
+      
+      // Call Better Auth reset password endpoint directly
+      const response = await fetch(`${import.meta.env.VITE_API_URL?.replace('/trpc', '') || 'http://localhost:3000'}/api/auth/reset-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          newPassword: password,
+          token: token,
+        }),
       });
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error('Reset password response:', response.status, errorData);
+        
+        if (response.status === 400 || response.status === 401) {
+          setTokenError("Reset link has expired or is invalid");
+          return;
+        }
+        
+        setPasswordError("Failed to reset password");
+        return;
+      }
       
       setShowSuccessToast(true);
       
