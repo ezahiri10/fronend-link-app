@@ -52,21 +52,38 @@ export default function RegisterPage() {
 
     try {
       setIsLoading(true);
-      await signUp.email({
+      const result = await signUp.email({
         email,
         password,
         name: email.split('@')[0],
       });
       
+      console.log('Sign up result:', result);
+      
+      // Check if there's an error in the result
+      if (result?.error) {
+        console.error('Sign up error:', result.error);
+        const errorMessage = result.error.message || String(result.error);
+        
+        if (errorMessage.toLowerCase().includes('already') || 
+            errorMessage.toLowerCase().includes('exist') ||
+            errorMessage.toLowerCase().includes('duplicate')) {
+          setEmailError("This email is already registered. Please login instead.");
+        } else {
+          setEmailError(errorMessage || "Registration failed. Please try again.");
+        }
+        return;
+      }
+      
       navigate({ to: "/dashboard/links" });
     } catch (error: any) {
-      console.error('Registration error:', error);
+      console.error('Registration error caught:', error);
       
       // Check for 422 status code (email already exists)
       if (error.status === 422 || error.statusCode === 422) {
         setEmailError("This email is already registered. Please login instead.");
-      } else if (error.message?.includes('already exists') || error.message?.includes('duplicate') || error.message?.includes('email')) {
-        setEmailError("Email already registered");
+      } else if (error.message?.includes('already') || error.message?.includes('exist') || error.message?.includes('duplicate')) {
+        setEmailError("This email is already registered. Please login instead.");
       } else if (error.message) {
         setEmailError(error.message);
       } else {
