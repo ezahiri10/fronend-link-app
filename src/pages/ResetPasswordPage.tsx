@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { authClient } from '../lib/auth';
 import { Link, useNavigate, useSearch } from '@tanstack/react-router';
 import { Input } from '../components/ui/Input';
 import { Toast } from '../components/ui/Toast';
+import { trpc } from '../lib/trpc';
 
 export default function ResetPasswordPage() {
   const navigate = useNavigate();
@@ -51,31 +51,11 @@ export default function ResetPasswordPage() {
     try {
       setIsLoading(true);
       
-      // Call Better Auth reset password endpoint directly
-      const response = await fetch(`${import.meta.env.VITE_API_URL?.replace('/trpc', '') || 'http://localhost:3000'}/api/auth/reset-password`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          newPassword: password,
-          token: token,
-        }),
+      // Use tRPC to reset password
+      await trpc.passwordReset.resetPassword.mutate({
+        token,
+        newPassword: password,
       });
-      
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        console.error('Reset password response:', response.status, errorData);
-        
-        if (response.status === 400 || response.status === 401) {
-          setTokenError("Reset link has expired or is invalid");
-          return;
-        }
-        
-        setPasswordError("Failed to reset password");
-        return;
-      }
       
       setShowSuccessToast(true);
       
@@ -84,7 +64,7 @@ export default function ResetPasswordPage() {
       }, 2000);
     } catch (error: any) {
       console.error('Reset password error:', error);
-      if (error.message?.includes('expired') || error.message?.includes('invalid')) {
+      if (error.message?.includes('expired') || error.message?.includes('invalid') || error.message?.includes('Invalid')) {
         setTokenError("Reset link has expired or is invalid");
       } else {
         setPasswordError("Failed to reset password");

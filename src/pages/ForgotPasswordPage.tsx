@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { authClient } from '../lib/auth';
 import { Link } from '@tanstack/react-router';
 import { Input } from '../components/ui/Input';
+import { trpc } from '../lib/trpc';
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -27,22 +27,8 @@ export default function ForgotPasswordPage() {
     try {
       setIsLoading(true);
       
-      // Call Better Auth forget password endpoint directly
-      const response = await fetch(`${import.meta.env.VITE_API_URL?.replace('/trpc', '') || 'http://localhost:3000'}/api/auth/forget-password`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          email,
-          redirectTo: `${window.location.origin}/reset-password`,
-        }),
-      });
-      
-      if (!response.ok) {
-        console.error('Forgot password response:', response.status, response.statusText);
-      }
+      // Use tRPC to request password reset
+      await trpc.passwordReset.requestReset.mutate({ email });
       
       setIsSuccess(true);
     } catch (error: any) {
