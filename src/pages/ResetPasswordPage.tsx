@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearch } from '@tanstack/react-router';
 import { Input } from '../components/ui/Input';
 import { Toast } from '../components/ui/Toast';
-import { trpc } from '../lib/trpc';
+import { useMutation } from '@tanstack/react-query';
 
 export default function ResetPasswordPage() {
   const navigate = useNavigate();
@@ -11,11 +11,40 @@ export default function ResetPasswordPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const [showSuccessToast, setShowSuccessToast] = useState(false);
   const [tokenError, setTokenError] = useState("");
 
   const token = (searchParams as any)?.token;
+
+  const resetPasswordMutation = useMutation({
+    mutationFn: async ({ token, newPassword }: { token: string; newPassword: string }) => {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/passwordReset.resetPassword`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ token, newPassword }),
+      });
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        throw new Error(error.message || 'Reset failed');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      setShowSuccessToast(true);
+      setTimeout(() => {
+        navigate({ to: "/login" });
+      }, 2000);
+    },
+    onError: (error: Error) => {
+      console.error('Reset password error:', error);
+      if (error.message?.includes('expired') || error.message?.includes('invalid') || error.message?.includes('Invalid')) {
+        setTokenError("Reset link has expired or is invalid");
+      } else {
+        setPasswordError("Failed to reset password");
+      }
+    },
+  });
 
   useEffect(() => {
     if (!token) {
@@ -48,30 +77,7 @@ export default function ResetPasswordPage() {
 
     if (hasError) return;
 
-    try {
-      setIsLoading(true);
-      
-      // Use tRPC to reset password
-      await trpc.passwordReset.resetPassword.mutate({
-        token,
-        newPassword: password,
-      });
-      
-      setShowSuccessToast(true);
-      
-      setTimeout(() => {
-        navigate({ to: "/login" });
-      }, 2000);
-    } catch (error: any) {
-      console.error('Reset password error:', error);
-      if (error.message?.includes('expired') || error.message?.includes('invalid') || error.message?.includes('Invalid')) {
-        setTokenError("Reset link has expired or is invalid");
-      } else {
-        setPasswordError("Failed to reset password");
-      }
-    } finally {
-      setIsLoading(false);
-    }
+    resetPasswordMutation.mutate({ token, newPassword: password });
   };
 
   if (tokenError) {
@@ -160,10 +166,10 @@ export default function ResetPasswordPage() {
 
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={resetPasswordMutation.isPending}
               className="w-full bg-primary text-white py-3 rounded-lg font-semibold text-sm hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:shadow-[2px_2px_10px_3px_#BEADFF]"
             >
-              {isLoading ? 'Resetting...' : 'Reset Password'}
+              {resetPasswordMutation.isPending ? 'Resetting...' : 'Reset Password'}
             </button>
           </form>
         </div>

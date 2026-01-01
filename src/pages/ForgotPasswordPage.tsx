@@ -1,13 +1,33 @@
 import { useState } from 'react';
 import { Link } from '@tanstack/react-router';
 import { Input } from '../components/ui/Input';
-import { trpc } from '../lib/trpc';
+import { useMutation } from '@tanstack/react-query';
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+
+  const requestResetMutation = useMutation({
+    mutationFn: async (email: string) => {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/passwordReset.requestReset`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ email }),
+      });
+      if (!response.ok) throw new Error('Request failed');
+      return response.json();
+    },
+    onSuccess: () => {
+      setIsSuccess(true);
+    },
+    onError: (error) => {
+      console.error('Forgot password error:', error);
+      // For security, don't reveal if email exists
+      setIsSuccess(true);
+    },
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,20 +44,7 @@ export default function ForgotPasswordPage() {
       return;
     }
 
-    try {
-      setIsLoading(true);
-      
-      // Use tRPC to request password reset
-      await trpc.passwordReset.requestReset.mutate({ email });
-      
-      setIsSuccess(true);
-    } catch (error: any) {
-      console.error('Forgot password error:', error);
-      // For security, don't reveal if email exists
-      setIsSuccess(true);
-    } finally {
-      setIsLoading(false);
-    }
+    requestResetMutation.mutate(email);
   };
 
   return (
@@ -101,10 +108,10 @@ export default function ForgotPasswordPage() {
 
               <button
                 type="submit"
-                disabled={isLoading}
+                disabled={requestResetMutation.isPending}
                 className="w-full bg-primary text-white py-3 rounded-lg font-semibold text-sm hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:shadow-[2px_2px_10px_3px_#BEADFF]"
               >
-                {isLoading ? 'Sending...' : 'Send Reset Link'}
+                {requestResetMutation.isPending ? 'Sending...' : 'Send Reset Link'}
               </button>
 
               <div className="text-center">
