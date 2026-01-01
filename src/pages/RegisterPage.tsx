@@ -60,10 +60,17 @@ export default function RegisterPage() {
       
       navigate({ to: "/dashboard/links" });
     } catch (error: any) {
-      if (error.message?.includes('already exists') || error.message?.includes('duplicate')) {
+      console.error('Registration error:', error);
+      
+      // Check for 422 status code (email already exists)
+      if (error.status === 422 || error.statusCode === 422) {
+        setEmailError("This email is already registered. Please login instead.");
+      } else if (error.message?.includes('already exists') || error.message?.includes('duplicate') || error.message?.includes('email')) {
         setEmailError("Email already registered");
+      } else if (error.message) {
+        setEmailError(error.message);
       } else {
-        setEmailError("Registration failed");
+        setEmailError("Registration failed. Please try again.");
       }
     } finally {
       setIsLoading(false);
