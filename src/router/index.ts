@@ -7,11 +7,15 @@ import { dashboardRoute } from './dashboard';
 import { linksRoute } from './links';
 import { profileRoute } from './profile';
 import { previewRoute } from './preview';
+import { Route as forgotPasswordRoute } from './forgot-password';
+import { Route as resetPasswordRoute } from './reset-password';
 
 const routeTree = rootRoute.addChildren([
   indexRoute,
   loginRoute,
   registerRoute,
+  forgotPasswordRoute,
+  resetPasswordRoute,
   dashboardRoute.addChildren([
     linksRoute,
     profileRoute,
