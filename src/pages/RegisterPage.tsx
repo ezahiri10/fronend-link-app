@@ -68,7 +68,7 @@ export default function RegisterPage() {
         if (errorMessage.toLowerCase().includes('already') || 
             errorMessage.toLowerCase().includes('exist') ||
             errorMessage.toLowerCase().includes('duplicate')) {
-          setEmailError("This email is already registered. Please login instead.");
+          setEmailError("Email already exist");
         } else {
           setEmailError(errorMessage || "Registration failed. Please try again.");
         }
@@ -81,9 +81,9 @@ export default function RegisterPage() {
       
       // Check for 422 status code (email already exists)
       if (error.status === 422 || error.statusCode === 422) {
-        setEmailError("This email is already registered. Please login instead.");
+        setEmailError("Email already exist");
       } else if (error.message?.includes('already') || error.message?.includes('exist') || error.message?.includes('duplicate')) {
-        setEmailError("This email is already registered. Please login instead.");
+        setEmailError("Email already exist");
       } else if (error.message) {
         setEmailError(error.message);
       } else {
