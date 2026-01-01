@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { signUp } from '../lib/auth';
 import { useNavigate, Link } from '@tanstack/react-router';
 import { Input } from '../components/ui/Input';
+import { Toast } from '../components/ui/Toast';
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -12,6 +13,7 @@ export default function RegisterPage() {
   const [passwordError, setPasswordError] = useState("");
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showSuccessToast, setShowSuccessToast] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,7 +77,13 @@ export default function RegisterPage() {
         return;
       }
       
-      navigate({ to: "/dashboard/links" });
+      // Show success toast
+      setShowSuccessToast(true);
+      
+      // Wait for toast to be visible, then navigate
+      setTimeout(() => {
+        navigate({ to: "/dashboard/links" });
+      }, 1500);
     } catch (error: any) {
       console.error('Registration error caught:', error);
       
@@ -172,6 +180,8 @@ export default function RegisterPage() {
           <Link to="/login" className="text-purple-600 font-medium hover:underline">Login</Link>
         </p>
       </div>
+
+      <Toast message="Account created successfully!" visible={showSuccessToast} />
     </div>
   );
 }
