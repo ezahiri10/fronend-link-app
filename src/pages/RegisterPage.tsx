@@ -60,11 +60,8 @@ export default function RegisterPage() {
         name: email.split('@')[0],
       });
       
-      console.log('Sign up result:', result);
-      
       // Check if there's an error in the result
       if (result?.error) {
-        console.error('Sign up error:', result.error);
         const errorMessage = result.error.message || String(result.error);
         
         if (errorMessage.toLowerCase().includes('already') || 
@@ -85,8 +82,6 @@ export default function RegisterPage() {
         navigate({ to: "/dashboard/links" });
       }, 1500);
     } catch (error: any) {
-      console.error('Registration error caught:', error);
-      
       // Check for 422 status code (email already exists)
       if (error.status === 422 || error.statusCode === 422) {
         setEmailError("Email already exist");
