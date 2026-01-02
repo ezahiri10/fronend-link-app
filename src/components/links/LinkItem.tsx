@@ -85,6 +85,30 @@ export function LinkItem({ link, index, onUpdate, onDelete, isUpdating, isDeleti
       return;
     }
 
+    // Platform-specific URL validation
+    const platformPatterns: Record<string, { pattern: RegExp; example: string }> = {
+      github: { pattern: /^https?:\/\/(www\.)?github\.com\/.+/i, example: "https://github.com/username" },
+      youtube: { pattern: /^https?:\/\/(www\.)?(youtube\.com|youtu\.be)\/.+/i, example: "https://youtube.com/@channel" },
+      linkedin: { pattern: /^https?:\/\/(www\.)?linkedin\.com\/.+/i, example: "https://linkedin.com/in/username" },
+      twitter: { pattern: /^https?:\/\/(www\.)?(twitter\.com|x\.com)\/.+/i, example: "https://twitter.com/username" },
+      facebook: { pattern: /^https?:\/\/(www\.)?facebook\.com\/.+/i, example: "https://facebook.com/username" },
+      twitch: { pattern: /^https?:\/\/(www\.)?twitch\.tv\/.+/i, example: "https://twitch.tv/username" },
+      devto: { pattern: /^https?:\/\/(www\.)?dev\.to\/.+/i, example: "https://dev.to/username" },
+      codewars: { pattern: /^https?:\/\/(www\.)?codewars\.com\/.+/i, example: "https://codewars.com/users/username" },
+      codepen: { pattern: /^https?:\/\/(www\.)?codepen\.io\/.+/i, example: "https://codepen.io/username" },
+      freecodecamp: { pattern: /^https?:\/\/(www\.)?freecodecamp\.org\/.+/i, example: "https://freecodecamp.org/username" },
+      gitlab: { pattern: /^https?:\/\/(www\.)?gitlab\.com\/.+/i, example: "https://gitlab.com/username" },
+      hashnode: { pattern: /^https?:\/\/([a-zA-Z0-9-]+\.)?hashnode\.dev.*$/i, example: "https://username.hashnode.dev" },
+      stackoverflow: { pattern: /^https?:\/\/(www\.)?stackoverflow\.com\/.+/i, example: "https://stackoverflow.com/users/123456" },
+      frontendmentor: { pattern: /^https?:\/\/(www\.)?frontendmentor\.io\/.+/i, example: "https://frontendmentor.io/profile/username" },
+    };
+
+    const platformValidation = platformPatterns[editPlatform];
+    if (platformValidation && !platformValidation.pattern.test(editUrl)) {
+      setUrlError(`Please enter a valid ${PLATFORMS.find(p => p.value === editPlatform)?.label} link (e.g. ${platformValidation.example})`);
+      return;
+    }
+
     if (editPlatform !== link.platform || editUrl !== link.url) {
       onUpdate(link.id, editPlatform, editUrl);
     }
