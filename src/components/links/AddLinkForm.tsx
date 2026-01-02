@@ -41,7 +41,6 @@ export function AddLinkForm({ linkNumber, onSubmit, onCancel, isPending }: AddLi
     
     if (hasError) return;
 
-    // Platform-specific URL validation
     const platformPatterns: Record<string, { pattern: RegExp; example: string }> = {
       github: { pattern: /^https?:\/\/(www\.)?github\.com\/.+/i, example: "https://github.com/username" },
       youtube: { pattern: /^https?:\/\/(www\.)?(youtube\.com|youtu\.be)\/.+/i, example: "https://youtube.com/@channel" },

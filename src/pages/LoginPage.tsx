@@ -12,7 +12,6 @@ export default function LoginPage() {
   const [passwordError, setPasswordError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  // Redirect if already authenticated
   useEffect(() => {
     if (!isPending && session?.user) {
       navigate({ to: "/dashboard/links" });
@@ -58,7 +57,6 @@ export default function LoginPage() {
         return;
       }
       
-      // Wait briefly for session to sync, then redirect
       setTimeout(() => {
         window.location.href = "/dashboard/links";
       }, 500);

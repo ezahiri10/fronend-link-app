@@ -60,7 +60,6 @@ export default function RegisterPage() {
         name: email.split('@')[0],
       });
       
-      // Check if there's an error in the result
       if (result?.error) {
         const errorMessage = result.error.message || String(result.error);
         
@@ -74,10 +73,8 @@ export default function RegisterPage() {
         return;
       }
       
-      // Show success toast
       setShowSuccessToast(true);
       
-      // Wait for toast to be visible, then navigate
       setTimeout(() => {
         navigate({ to: "/dashboard/links" });
       }, 1500);
