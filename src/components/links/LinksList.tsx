@@ -32,21 +32,32 @@ interface LinksListProps {
 
 export function LinksList({ links, onUpdate, onDelete, onReorder, isUpdating, isDeleting, isReordering }: LinksListProps) {
   const [items, setItems] = useState(links);
+  const [isDragging, setIsDragging] = useState(false);
 
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
   );
 
   useEffect(() => {
-    if (!isReordering) {
+    if (!isDragging && !isReordering) {
       setItems(links);
     }
-  }, [links, isReordering]);
+  }, [links, isDragging, isReordering]);
+
+  const handleDragStart = () => {
+    setIsDragging(true);
+  };
 
   const handleDragEnd = (event: DragEndEvent) => {
+    setIsDragging(false);
+    
     const { active, over } = event;
 
     if (over && active.id !== over.id) {
@@ -83,7 +94,12 @@ export function LinksList({ links, onUpdate, onDelete, onReorder, isUpdating, is
   }
 
   return (
-    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+    <DndContext 
+      sensors={sensors} 
+      collisionDetection={closestCenter} 
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+    >
       <SortableContext items={items.map((item) => item.id)} strategy={verticalListSortingStrategy}>
         <div className="space-y-4">
           {items.map((link, index) => (
