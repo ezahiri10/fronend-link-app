@@ -33,6 +33,7 @@ interface LinksListProps {
 export function LinksList({ links, onUpdate, onDelete, onReorder, isUpdating, isDeleting, isReordering }: LinksListProps) {
   const [items, setItems] = useState(links);
   const isReorderingRef = useRef(false);
+  const linksRef = useRef(links);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -46,17 +47,19 @@ export function LinksList({ links, onUpdate, onDelete, onReorder, isUpdating, is
   );
 
   useEffect(() => {
+    linksRef.current = links;
+    
     if (!isReorderingRef.current) {
       setItems(links);
     }
   }, [links]);
 
   useEffect(() => {
-    if (!isReordering && isReorderingRef.current) {
+    if (isReordering === false && isReorderingRef.current) {
       isReorderingRef.current = false;
-      setItems(links);
+      setItems(linksRef.current);
     }
-  }, [isReordering, links]);
+  }, [isReordering]);
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
