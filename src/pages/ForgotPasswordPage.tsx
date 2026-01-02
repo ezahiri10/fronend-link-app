@@ -23,8 +23,6 @@ export default function ForgotPasswordPage() {
       setIsSuccess(true);
     },
     onError: (error) => {
-      console.error('Forgot password error:', error);
-      // For security, don't reveal if email exists
       setIsSuccess(true);
     },
   });

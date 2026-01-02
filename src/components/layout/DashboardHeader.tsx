@@ -30,7 +30,6 @@ export function DashboardHeader({ userId, activeTab }: DashboardHeaderProps) {
         navigate({ to: "/login" });
       }, 1500);
     } catch (error) {
-      console.error('Logout failed:', error);
     }
   };
 

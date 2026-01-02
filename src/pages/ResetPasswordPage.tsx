@@ -37,7 +37,6 @@ export default function ResetPasswordPage() {
       }, 2000);
     },
     onError: (error: Error) => {
-      console.error('Reset password error:', error);
       if (error.message?.includes('expired') || error.message?.includes('invalid') || error.message?.includes('Invalid')) {
         setTokenError("Reset link has expired or is invalid");
       } else {
