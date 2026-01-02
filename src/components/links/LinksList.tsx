@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   DndContext,
   closestCenter,
@@ -32,7 +32,8 @@ interface LinksListProps {
 
 export function LinksList({ links, onUpdate, onDelete, onReorder, isUpdating, isDeleting, isReordering }: LinksListProps) {
   const [items, setItems] = useState(links);
-  const [isDragging, setIsDragging] = useState(false);
+  const isDraggingRef = useRef(false);
+  const justReorderedRef = useRef(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -46,21 +47,27 @@ export function LinksList({ links, onUpdate, onDelete, onReorder, isUpdating, is
   );
 
   useEffect(() => {
-    if (!isDragging && !isReordering) {
+    if (!isDraggingRef.current && !justReorderedRef.current) {
       setItems(links);
     }
-  }, [links, isDragging, isReordering]);
+    if (!isReordering && justReorderedRef.current) {
+      justReorderedRef.current = false;
+      setItems(links);
+    }
+  }, [links, isReordering]);
 
   const handleDragStart = () => {
-    setIsDragging(true);
+    isDraggingRef.current = true;
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
-    setIsDragging(false);
+    isDraggingRef.current = false;
     
     const { active, over } = event;
 
     if (over && active.id !== over.id) {
+      justReorderedRef.current = true;
+      
       const oldIndex = items.findIndex((item) => item.id === active.id);
       const newIndex = items.findIndex((item) => item.id === over.id);
 
