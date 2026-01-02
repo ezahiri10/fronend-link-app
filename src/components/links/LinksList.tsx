@@ -65,19 +65,22 @@ export function LinksList({ links, onUpdate, onDelete, onReorder, isUpdating, is
     const { active, over } = event;
 
     if (over && active.id !== over.id) {
-      isReorderingRef.current = true;
-      
       const oldIndex = items.findIndex((item) => item.id === active.id);
       const newIndex = items.findIndex((item) => item.id === over.id);
 
       const newItems = arrayMove(items, oldIndex, newIndex);
+      
+      isReorderingRef.current = true;
       setItems(newItems);
 
       const reorderedLinks = newItems.map((item, index) => ({
         id: item.id,
         position: index,
       }));
-      onReorder(reorderedLinks);
+      
+      setTimeout(() => {
+        onReorder(reorderedLinks);
+      }, 0);
     }
   };
 
