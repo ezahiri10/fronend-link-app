@@ -105,7 +105,7 @@ export function LinkItem({ link, index, onUpdate, onDelete, isUpdating, isDeleti
 
     const platformValidation = platformPatterns[editPlatform];
     if (platformValidation && !platformValidation.pattern.test(editUrl)) {
-      setUrlError(`Please enter a valid ${PLATFORMS.find(p => p.value === editPlatform)?.label} link (e.g. ${platformValidation.example})`);
+      setUrlError(`Invalid ${PLATFORMS.find(p => p.value === editPlatform)?.label} URL`);
       return;
     }
 

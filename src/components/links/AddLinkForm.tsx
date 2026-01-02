@@ -61,7 +61,7 @@ export function AddLinkForm({ linkNumber, onSubmit, onCancel, isPending }: AddLi
 
     const platformValidation = platformPatterns[platform];
     if (platformValidation && !platformValidation.pattern.test(url)) {
-      setUrlError(`Please enter a valid ${PLATFORMS.find(p => p.value === platform)?.label} link (e.g. ${platformValidation.example})`);
+      setUrlError(`Invalid ${PLATFORMS.find(p => p.value === platform)?.label} URL`);
       return;
     }
     
