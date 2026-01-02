@@ -14,7 +14,6 @@ export function useAuth() {
   });
 
   useEffect(() => {
-    // Only redirect if session check is complete and user is definitely not authenticated
     if (!isPending && !isLoading && !session?.user) {
       navigate({ to: '/login' });
     }

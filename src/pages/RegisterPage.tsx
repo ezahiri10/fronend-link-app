@@ -79,7 +79,6 @@ export default function RegisterPage() {
         navigate({ to: "/dashboard/links" });
       }, 1500);
     } catch (error: any) {
-      // Check for 422 status code (email already exists)
       if (error.status === 422 || error.statusCode === 422) {
         setEmailError("Email already exist");
       } else if (error.message?.includes('already') || error.message?.includes('exist') || error.message?.includes('duplicate')) {
