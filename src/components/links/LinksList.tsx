@@ -32,8 +32,7 @@ interface LinksListProps {
 
 export function LinksList({ links, onUpdate, onDelete, onReorder, isUpdating, isDeleting, isReordering }: LinksListProps) {
   const [items, setItems] = useState(links);
-  const isDraggingRef = useRef(false);
-  const justReorderedRef = useRef(false);
+  const isReorderingRef = useRef(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -47,26 +46,23 @@ export function LinksList({ links, onUpdate, onDelete, onReorder, isUpdating, is
   );
 
   useEffect(() => {
-    if (!isDraggingRef.current && !justReorderedRef.current) {
+    if (!isReorderingRef.current) {
       setItems(links);
     }
-    if (!isReordering && justReorderedRef.current) {
-      justReorderedRef.current = false;
-      setItems(links);
-    }
-  }, [links, isReordering]);
+  }, [links]);
 
-  const handleDragStart = () => {
-    isDraggingRef.current = true;
-  };
+  useEffect(() => {
+    if (!isReordering && isReorderingRef.current) {
+      isReorderingRef.current = false;
+      setItems(links);
+    }
+  }, [isReordering, links]);
 
   const handleDragEnd = (event: DragEndEvent) => {
-    isDraggingRef.current = false;
-    
     const { active, over } = event;
 
     if (over && active.id !== over.id) {
-      justReorderedRef.current = true;
+      isReorderingRef.current = true;
       
       const oldIndex = items.findIndex((item) => item.id === active.id);
       const newIndex = items.findIndex((item) => item.id === over.id);
@@ -104,7 +100,6 @@ export function LinksList({ links, onUpdate, onDelete, onReorder, isUpdating, is
     <DndContext 
       sensors={sensors} 
       collisionDetection={closestCenter} 
-      onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
       <SortableContext items={items.map((item) => item.id)} strategy={verticalListSortingStrategy}>
