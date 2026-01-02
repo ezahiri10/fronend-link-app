@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   DndContext,
   closestCenter,
@@ -27,9 +27,10 @@ interface LinksListProps {
   onReorder: (reorderedLinks: Array<{ id: number; position: number }>) => void;
   isUpdating: boolean;
   isDeleting: boolean;
+  isReordering?: boolean;
 }
 
-export function LinksList({ links, onUpdate, onDelete, onReorder, isUpdating, isDeleting }: LinksListProps) {
+export function LinksList({ links, onUpdate, onDelete, onReorder, isUpdating, isDeleting, isReordering }: LinksListProps) {
   const [items, setItems] = useState(links);
 
   const sensors = useSensors(
@@ -39,9 +40,11 @@ export function LinksList({ links, onUpdate, onDelete, onReorder, isUpdating, is
     })
   );
 
-  if (JSON.stringify(items) !== JSON.stringify(links)) {
-    setItems(links);
-  }
+  useEffect(() => {
+    if (!isReordering) {
+      setItems(links);
+    }
+  }, [links, isReordering]);
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;

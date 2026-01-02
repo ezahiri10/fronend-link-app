@@ -90,6 +90,7 @@ export default function LinksPage() {
                   onReorder={handleReorderLinks}
                   isUpdating={updateLink.isPending}
                   isDeleting={deleteLink.isPending}
+                  isReordering={reorderLinks.isPending}
                 />
               )}
             </div>
