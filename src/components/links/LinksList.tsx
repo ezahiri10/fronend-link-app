@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import {
   DndContext,
   closestCenter,
@@ -32,8 +32,6 @@ interface LinksListProps {
 
 export function LinksList({ links, onUpdate, onDelete, onReorder, isUpdating, isDeleting, isReordering }: LinksListProps) {
   const [items, setItems] = useState(links);
-  const isReorderingRef = useRef(false);
-  const linksRef = useRef(links);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -47,19 +45,8 @@ export function LinksList({ links, onUpdate, onDelete, onReorder, isUpdating, is
   );
 
   useEffect(() => {
-    linksRef.current = links;
-    
-    if (!isReorderingRef.current) {
-      setItems(links);
-    }
+    setItems(links);
   }, [links]);
-
-  useEffect(() => {
-    if (isReordering === false && isReorderingRef.current) {
-      isReorderingRef.current = false;
-      setItems(linksRef.current);
-    }
-  }, [isReordering]);
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
@@ -69,8 +56,6 @@ export function LinksList({ links, onUpdate, onDelete, onReorder, isUpdating, is
       const newIndex = items.findIndex((item) => item.id === over.id);
 
       const newItems = arrayMove(items, oldIndex, newIndex);
-      
-      isReorderingRef.current = true;
       setItems(newItems);
 
       const reorderedLinks = newItems.map((item, index) => ({
@@ -78,9 +63,7 @@ export function LinksList({ links, onUpdate, onDelete, onReorder, isUpdating, is
         position: index,
       }));
       
-      setTimeout(() => {
-        onReorder(reorderedLinks);
-      }, 0);
+      onReorder(reorderedLinks);
     }
   };
 

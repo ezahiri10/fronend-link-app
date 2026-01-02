@@ -18,9 +18,20 @@ export function useLinks() {
   });
 
   const reorderLinks = trpc.links.reorder.useMutation({
-    onMutate: async (newLinks) => {
+    onMutate: async (variables) => {
       await utils.links.getAll.cancel();
+      
       const previousLinks = utils.links.getAll.getData();
+      
+      if (previousLinks) {
+        const reorderedLinks = variables.links.map(({ id, position }) => {
+          const link = previousLinks.find(l => l.id === id);
+          return link;
+        }).filter(Boolean);
+        
+        utils.links.getAll.setData(undefined, reorderedLinks as any);
+      }
+      
       return { previousLinks };
     },
     onError: (err, newLinks, context) => {
