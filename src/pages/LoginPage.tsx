@@ -54,6 +54,7 @@ export default function LoginPage() {
       if (result.error) {
         setEmailError("Invalid credentials");
         setPasswordError("Invalid credentials");
+        setIsLoading(false);
         return;
       }
       
